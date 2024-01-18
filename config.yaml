@@ -1,0 +1,8 @@
+db:
+  host: "testproject-database-1"
+  user: "postgres"
+  password: "052005"
+  name: "test"
+  port: 5436
+app:
+  port: 8081
