@@ -10,16 +10,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Handler представляет собой обработчик HTTP-запросов для взаимодействия с сервисом.
 type Handler struct {
 	service *service.Service
 	logger  *logging.Logger
 }
 
+// NewHandler принимает service и logger в конструкторе и возрашает cтруктуру *Handler.
 func NewHandler(service service.Service, logger *logging.Logger) *Handler {
 	return &Handler{service: &service, logger: logger}
 }
 
-// обработчик создания нового человека
+// CreatePerson обработчик создания нового человека.
 func (h *Handler) CreatePerson(c *gin.Context) {
 	h.logger.Debug("Handling CreatePerson request")
 	var input model.Person
@@ -38,7 +40,7 @@ func (h *Handler) CreatePerson(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"id": input.ID})
 }
 
-// обработчик получения списка людей
+// GetPeople обработчик получения списка людей.
 func (h *Handler) GetPeople(c *gin.Context) {
 	h.logger.Debug("Handling GetPeople request")
 	filters := make(map[string]interface{})
@@ -70,7 +72,7 @@ func (h *Handler) GetPeople(c *gin.Context) {
 	c.JSON(http.StatusOK, people)
 }
 
-// обработчик получения информации о человеке по идентификатору
+// GetPersonById обработчик получения информации о человеке по идентификатору.
 func (h *Handler) GetPersonById(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -89,7 +91,7 @@ func (h *Handler) GetPersonById(c *gin.Context) {
 
 }
 
-// обработчик обновления информации о человеке
+// UpdatePerson обработчик обновления информации о человеке.
 func (h *Handler) UpdatePerson(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -116,7 +118,7 @@ func (h *Handler) UpdatePerson(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "person updated successfully"})
 }
 
-// обработчик удаления информации о человеке
+// DeletePerson обработчик удаления информации о человеке.
 func (h *Handler) DeletePerson(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {

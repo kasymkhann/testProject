@@ -14,12 +14,13 @@ import (
 var ErrRowsAffected = errors.New("Error getting RowsAffected. This may indicate a problem with the underlying database or an issue with the query execution. Please check the database connection and the correctness of the query.")
 var ErrNamedExec = errors.New("Error in NamedExec. This may indicate a problem with the underlying database or an issue with the query execution. Please check the database connection and the correctness of the query.")
 
+// repository представляет собой сервис для работы с БД.
 type Repository struct {
 	db     *sqlx.DB
 	logger *logging.Logger
 }
 
-// спросить у макса покрывать код логгами или нет и еще как вытащить все ошибки в логе в одну чтобы было стурктурировано
+// NewRepository создает новый экземпляр repository с переданным url и логгером в конструкторе.
 func NewRepository(databaseURL string, logging *logging.Logger) (*Repository, error) {
 	db, err := sqlx.Connect("postgres", databaseURL)
 	if err != nil {
@@ -28,7 +29,7 @@ func NewRepository(databaseURL string, logging *logging.Logger) (*Repository, er
 	return &Repository{db: db, logger: logging}, nil
 }
 
-// Создания
+// CreatePerson создает новую запись о человеке в базе данных.
 func (r *Repository) CreatePerson(person *model.Person) error {
 	r.logger.Debug("Repository: Handling CreatePerson request")
 
@@ -47,7 +48,7 @@ func (r *Repository) CreatePerson(person *model.Person) error {
 
 }
 
-// получения
+// GetPeople возвращает список людей с учетом переданных фильтров, смещения и лимита.
 func (r *Repository) GetPeople(filters map[string]interface{}, offset, limit int) ([]model.Person, error) {
 	query := `SELECT * FROM people WHERE`
 	args := make([]interface{}, 0)
@@ -68,7 +69,7 @@ func (r *Repository) GetPeople(filters map[string]interface{}, offset, limit int
 	return people, nil
 }
 
-// получения по id
+// GetPersonById возвращает информацию о человеке по его идентификатору.
 func (r *Repository) GetPersonById(id int) (*model.Person, error) {
 	var person model.Person
 	err := r.db.Get(&person, "SELECT * FROM people WHERE id = $1", id)
@@ -79,7 +80,7 @@ func (r *Repository) GetPersonById(id int) (*model.Person, error) {
 	return &person, nil
 }
 
-// обноваления человека в бд
+// UpdatePerson обновляет информацию о человеке в базе данных.
 func (r *Repository) UpdatePerson(person *model.Person) error {
 	query := `UPDATE people SET name=:name, surname=:surname, patronymic=:patronymic, 
 	age=:age, gender=:gender, nationality=:nationality WHERE id=:id`
@@ -99,7 +100,7 @@ func (r *Repository) UpdatePerson(person *model.Person) error {
 	return nil
 }
 
-// удалеения person
+// DeletePerson удаляет запись о человеке из базы данных по его id.
 func (r *Repository) DeletePerson(id int) error {
 	result, err := r.db.Exec("DELETE FROM people WHERE id = $1", id)
 	if err != nil {

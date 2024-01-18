@@ -55,7 +55,7 @@ func (s *Service) CreatePerson(person *model.Person) error {
 }
 
 // GetPeople возвращает список людей с учетом переданных фильтров, смещения и лимита.
-// Возрашаеть ошибку если не удолась
+// Возрашаеть ошибку если не удолась.
 func (s *Service) GetPeople(filter map[string]interface{}, offset, limit int) ([]model.Person, error) {
 	s.logger.Debug("Service: Handling GetPeople request")
 
@@ -70,6 +70,7 @@ func (s *Service) GetPeople(filter map[string]interface{}, offset, limit int) ([
 // Возвращает ошибку, если человек не найден или при возникновении других проблем.
 func (s *Service) GetPersonById(id int) (*model.Person, error) {
 	s.logger.Debug("Service: Handling GetPersonById request")
+
 	person, err := s.repo.GetPersonById(id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -87,6 +88,7 @@ func (s *Service) GetPersonById(id int) (*model.Person, error) {
 // Возвращает ошибку, если не удалось обновить информацию или при возникновении других проблем
 func (s *Service) UpdatePerson(person *model.Person) error {
 	s.logger.Debug("Service: Handling UpdatePerson request")
+
 	err := s.repo.UpdatePerson(person)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -102,6 +104,7 @@ func (s *Service) UpdatePerson(person *model.Person) error {
 // DeletePerson удаляет запись о человеке из базы данных по его id.
 func (s *Service) DeletePerson(id int) error {
 	s.logger.Debug("Service: Handling DeletePerson request")
+
 	err := s.repo.DeletePerson(id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -207,6 +210,7 @@ func (s *Service) enrichWithGender(name string) (string, error) {
 // Возвращает национальность и ошибку, если запрос к сервису не удался.
 func (s *Service) enrichWithNationality(name string) (string, error) {
 	s.logger.Debug("Service: Enriching with nationality")
+
 	url := fmt.Sprintf("https://api.nationalize.io/?name=%s", name)
 	resp, err := http.Get(url)
 	if err != nil {

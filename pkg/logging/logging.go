@@ -10,11 +10,13 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// writerHook хук для направления записей журнала в несколько writer'ов в зависимости от уровней логирования.
 type writerHook struct {
 	Writer    []io.Writer
 	LogLevels []logrus.Level
 }
 
+// Fire отправляет записи журнала в указанные writer'ы в зависимости от уровней логирования.
 func (hook *writerHook) Fire(entry *logrus.Entry) error {
 	line, err := entry.String()
 	if err != nil {
@@ -26,24 +28,29 @@ func (hook *writerHook) Fire(entry *logrus.Entry) error {
 	return err
 }
 
+// Levels возвращает уровни логирования, которые активируют хук.
 func (hook *writerHook) Levels() []logrus.Level {
 	return hook.LogLevels
 }
 
 var e *logrus.Entry
 
+// Структурированный логгер, расширяющий тип Entry из Logrus.
 type Logger struct {
 	*logrus.Entry
 }
 
+// GetLogger создает новый экземпляр логгера.
 func GetLogger() *Logger {
 	return &Logger{e}
 }
 
+// GetLoggerWithField создает новый экземпляр логгера с дополнительным полем.
 func (l *Logger) GetLoggerWithField(k string, v interface{}) *Logger {
 	return &Logger{l.WithField(k, v)}
 }
 
+// init Инициализирует логгер с указанными конфигурациями.
 func init() {
 	l := logrus.New()
 	l.SetReportCaller(true)

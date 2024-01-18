@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// регистрирует роутеры
+// RegisterRoutes регистрирует маршруты HTTP для взаимодействия с обработчиками, используемыми сервисом.
 func RegisterRoutes(router *gin.Engine, service *service.Service) {
 	handler := NewHandler(*service, logging.GetLogger())
 
