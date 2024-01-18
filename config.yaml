@@ -1,5 +1,5 @@
 db:
-  host: "testproject-database-1"
+  host: "localhost"
   user: "postgres"
   password: "052005"
   name: "test"

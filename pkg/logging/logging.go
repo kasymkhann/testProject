@@ -56,7 +56,7 @@ func init() {
 		FullTimestamp: true,
 	}
 
-	err := os.MkdirAll("logs", 0644)
+	err := os.MkdirAll("logs", 0755) // 0644
 	if err != nil {
 		panic(err)
 	}

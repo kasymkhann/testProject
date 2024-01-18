@@ -11,6 +11,7 @@ import (
 	"testProject/service"
 
 	_ "github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
 
 	"github.com/gin-gonic/gin"
 )
