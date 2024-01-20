@@ -1,9 +1,12 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 	"testProject/internal/config"
 	"testProject/internal/handlers"
 	"testProject/pkg/logging"
@@ -34,6 +37,7 @@ func main() {
 		logger.Fatalf("Failed to create repository: %v", err)
 		return
 	}
+
 	logger.Info("Repository created successfully.")
 
 	logger.Info("Creating service...")
@@ -43,12 +47,33 @@ func main() {
 	router := gin.Default()
 	handlers.RegisterRoutes(router, service)
 
-	port := cfg.App.Port
-	addr := fmt.Sprintf(":%d", port)
-	logger.Info("Starting server at", addr, "on", time.Now())
-	if err := http.ListenAndServe(addr, router); err != nil {
-		logger.Fatal("Failed to start server:", err)
-		os.Exit(1)
+	server := &http.Server{
+		Addr:    fmt.Sprintf(":%d", cfg.App.Port),
+		Handler: router,
 	}
+
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
+
+	go func() {
+		logger.Info("Starting server at", server.Addr, "on", time.Now())
+		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			logger.Fatal("Failed to start server:", err)
+			os.Exit(1)
+		}
+
+	}()
+
+	<-stop
+	logger.Info("Received termination signal. Shutting down gracefully...")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	if err := server.Shutdown(ctx); err != nil {
+		logger.Fatal("Server shutdown error:", err)
+	}
+
+	logger.Info("Server gracefully stopped.")
 
 }
